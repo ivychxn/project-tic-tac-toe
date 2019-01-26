@@ -22,15 +22,15 @@ def who_goes_first():
 def main():
 
     print ('Welcome to Tic Tac Toe')
-    starter = whoGoesFirst()
+    starter = who_goes_first()
 
-    playerLetter = inputPlayerLetter()
-    #Here assign computerLetter to be 'O' if playerLetter is 'X' or vice versa
+    player_letter = input_player_letter()
+    #Here assign computer_letter to be 'O' if player_letter is 'X' or vice versa
 
 
 
     #initialize your board list here to pass to draw the board
     #board =
-    drawBoard(board)
+    draw_board(board)
 
 main()
