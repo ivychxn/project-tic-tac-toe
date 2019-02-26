@@ -1,5 +1,7 @@
 # --------------Session 2---------------%
 
+import random
+
 # initialize your board list as global list here to pass to draw the board
 Board = [' '] * 10
 
@@ -51,8 +53,8 @@ def is_winner(board, letter):
 def is_space_free(board, position):
     '''Return True if the space is free, false if it isn't'''
     if board[position] == ' ':
-      return True;
-    return False;
+      return True
+    return False
 
 
 def player_move(board):
@@ -68,9 +70,131 @@ def player_move(board):
       move = int(input('Where do you want to place your move?\n'))
       return move
 
+''' board is the game board, comp is the computer letter, play is the player letter '''
+def get_computer_move(board, comp, play):
+    move = 0
+
+    # Check if board is full
+    if(is_board_full(board)):
+        return 0
+
+    # Check if computer is playing first. If so, choose center
+    if(is_board_empty(board)):
+        return 5
+
+    # Check if computer is one away from winning
+    move = one_away_from_win(board, comp)
+    if(move != 0):
+        return move
+    
+    # Check if player is one away from winning
+    move = one_away_from_win(board, play)
+    if(move != 0):
+        return move
+    
+    # Check corners
+    if(is_space_free(board, 1)):
+        return 1
+    if(is_space_free(board, 3)):
+        return 3
+    if(is_space_free(board, 7)):
+        return 7
+    if(is_space_free(board, 9)):
+        return 9
+
+    # Go to center
+    if(is_space_free(board, 5)):
+        return 5
+
+    # Random
+    while(move == 0):
+        move = random.randint(1,9)
+        if(is_space_free(board, move)):
+            return move;
+        else:
+            move = 0
+
+def one_away_from_win(board, letter):
+    ''' Algorithm to block '''
+    streak = 0
+    move = 0
+    # check rows
+    for row in range(1,3):
+        streak = 0
+        rowStart = 1
+        for position in range(rowStart,row+2):
+            if board[position] == letter:
+                streak += 1
+            else:
+                move = position
+        if(streak == 2):
+            print(move)
+            if( is_space_free( board, move ) ):
+                return move
+        rowStart += 3
+
+    # check columns
+    for col in range(1,3):
+        streak = 0
+        position = col
+        for count in range(1,3):
+            if board[position] == letter:
+                streak += 1
+            else:
+                move = position
+            position += 3
+        if(streak == 2):
+            if( is_space_free( board, move ) ):
+                return move
+
+    # check diagonals
+    streak = 0
+    if board[1] == letter:
+        streak += 1
+    else:
+        move = 1 
+    if board[5] == letter:
+        streak += 1
+    else:
+        move = 5
+    if board[9] == letter:
+        streak += 1
+    else:
+        move = 9
+    if(streak == 2):
+        if( is_space_free( board, move ) ):
+            return move
+
+    streak = 0
+    if board[3] == letter:
+        streak += 1
+    else:
+        move = 3 
+    if board[5] == letter:
+        streak += 1
+    else:
+        move = 5
+    if board[7] == letter:
+        streak += 1
+    else:
+        move = 7
+    if(streak == 2):
+        if( is_space_free( board, move ) ):
+            return move
+
+    # in the case none of it works
+    return 0
+
 def make_move(board, letter, position):
     '''Input the letter onto the board at the specified position'''
     board[position] = letter
+
+def is_board_empty(board):
+    ''' Checks if board is empty '''
+    for position in range(1, 9):
+      if((is_space_free(board, position)) == False ):
+        return False
+    return True
 
 def is_board_full(board):
     '''We need to check is the board is full to declare a tie
@@ -161,16 +285,34 @@ def main():
 
             # check if player of computer is the starter, then make their move and check for win or tie
             
+            #player_has_made_move = 0
+
             # have a case for if player goes or if computer will go which will
             # 1. draw the board
             draw_board(Board)
             
-            # 2. get the move from respective player
-            move = player_move(Board)
+            move = 0
+            CMove = 0
+
             
-            # 3. make the move onto the board
-            make_move(Board, player_letter, move)
-            
+            # 2 & 3 get the move from respective player
+            while( move == 0 ):
+                move = player_move(Board)
+                if(is_space_free(Board, move) == True):
+                    make_move(Board, player_letter, move)
+                    #player_has_made_move = 1
+                else:
+                    move = 0
+            draw_board(Board)
+
+            while( CMove == 0 ):
+                CMove = get_computer_move(Board, computer_letter, player_letter)
+                print(CMove)
+                if( is_space_free(Board, CMove) == True):
+                    make_move(Board, computer_letter, CMove)
+                else:
+                    CMove = 0
+
             # 4. check if player/computer won
             track = 0
             if is_winner(Board, player_letter):
